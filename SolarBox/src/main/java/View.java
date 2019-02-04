@@ -21,7 +21,7 @@ public class View {
   private int WINDOW_WIDTH,WINDOW_HEIGHT,ORTHO_VERTICAL = 300, ORTHO_HORIZONTAL = 300;
   private Matrix4f proj;
   Stack<Matrix4f> modelview;
-  private int angleOfRotation = 0;
+
   private ObjectInfo box = new ObjectInfo(),
           sun = new ObjectInfo(),
           mars = new ObjectInfo(),
@@ -33,6 +33,7 @@ public class View {
           marsSatellite2 = new ObjectInfo()
   ;
 
+  private float angleOfRotation = 0;
   private float marsAngle = 0,
           earthAngle = 30,
           jupiterAngle = -100,
@@ -119,15 +120,24 @@ public class View {
     //enable the shader program
     program.enable(gl);
 
-    float[] lookAngle = new float[] {0,0,200};
+    ////////////////////Set view angle/////////////////////
 
-    ///////////////////Draw the box///////////////////////
+    angleOfRotation = 0;//(angleOfRotation+0.5f)%360;
+
     modelview.push(new Matrix4f());
 
     modelview.push(new Matrix4f(modelview.peek()));
     modelview.peek()
-            .lookAt(new Vector3f(lookAngle[0],lookAngle[1],lookAngle[2]),new Vector3f(0,
-            0,0),new Vector3f(0,1,0));
+            .lookAt(new Vector3f(0,0,250),new Vector3f(0,
+                    0,0),new Vector3f(0,1,0));
+
+    modelview.push(new Matrix4f(modelview.peek()));
+    modelview.peek()
+            .rotate((float)Math.toRadians(angleOfRotation),0,1,0);
+
+    //////////////////////////////////////////////////////
+
+    ///////////////////Draw the box///////////////////////
 
     modelview.push(new Matrix4f(modelview.peek()));
     modelview.peek()
@@ -135,24 +145,17 @@ public class View {
 
     box.objectDrawable(gl,gla,modelview,proj,shaderLocations);
 
-    modelview.pop(); modelview.pop(); modelview.pop();
+    modelview.pop();
     /////////////////////////////////////////////////////
 
     ///////////////////Draw the sun//////////////////////
-    modelview.push(new Matrix4f());
-
-    modelview.push(new Matrix4f(modelview.peek()));
-    modelview.peek()
-            .lookAt(new Vector3f(lookAngle[0],lookAngle[1],lookAngle[2]),new Vector3f(0,
-            0,0),new Vector3f(0,1,0));
-
     modelview.push(new Matrix4f(modelview.peek()));
     modelview.peek()
             .scale(SolarConstants.SUN_SIZE,SolarConstants.SUN_SIZE,SolarConstants.SUN_SIZE);
 
     sun.objectDrawable(gl,gla,modelview,proj,shaderLocations);
 
-    modelview.pop(); modelview.pop(); modelview.pop();
+    modelview.pop();
     /////////////////////////////////////////////////////
 
 
@@ -162,13 +165,6 @@ public class View {
     marsSatelliteAngle1 = (marsSatelliteAngle1 - 360f/SolarConstants.MARS_SATELLITE_YEAR1) % 360 ;
     marsSatelliteAngle2 = (marsSatelliteAngle2 - 360f/SolarConstants.MARS_SATELLITE_YEAR2) % 360 ;
 
-
-    modelview.push(new Matrix4f());
-
-    modelview.push(new Matrix4f(modelview.peek()));
-    modelview.peek()
-            .lookAt(new Vector3f(lookAngle[0],lookAngle[1],lookAngle[2]),new Vector3f(0,
-            0,0),new Vector3f(0,1,0));
 
     // Draw mars
     modelview.push(new Matrix4f(modelview.peek()));
@@ -201,7 +197,7 @@ public class View {
     modelview.pop();
 
 
-    modelview.pop(); modelview.pop(); modelview.pop();
+    modelview.pop();
 
     marsOrbit.DotDrawable(gl, gla, marsOrbitObj, proj, shaderLocations);
     /////////////////////////////////////////////////////
@@ -211,12 +207,6 @@ public class View {
     earthAngle = (earthAngle+ 360f/SolarConstants.EARTH_YEAR) % 360 ;
     earthSatelliteAngle = (earthSatelliteAngle - 360f/SolarConstants.EARTH_SATELLITE_YEAR) % 360 ;
 
-    modelview.push(new Matrix4f());
-
-    modelview.push(new Matrix4f(modelview.peek()));
-    modelview.peek()
-            .lookAt(new Vector3f(lookAngle[0],lookAngle[1],lookAngle[2]),new Vector3f(0,
-            0,0),new Vector3f(0,1,0));
 
     modelview.push(new Matrix4f(modelview.peek()));
     modelview.peek()
@@ -232,19 +222,13 @@ public class View {
 
     earthSatellite.objectDrawable(gl,gla,modelview,proj,shaderLocations);
 
-    modelview.pop(); modelview.pop(); modelview.pop(); modelview.pop();
+    modelview.pop(); modelview.pop();
     /////////////////////////////////////////////////////
 
     ///////////////////Draw the jupiter///////////////////
 
     jupiterAngle = (jupiterAngle + 360f/SolarConstants.JUPITER_YEAR) % 360 ;
 
-    modelview.push(new Matrix4f());
-
-    modelview.push(new Matrix4f(modelview.peek()));
-    modelview.peek()
-            .lookAt(new Vector3f(lookAngle[0],lookAngle[1],lookAngle[2]),new Vector3f(0,
-            0,0),new Vector3f(0,1,0));
     modelview.push(new Matrix4f(modelview.peek()));
     modelview.peek()
             .rotate((float)Math.toRadians(jupiterAngle),0,0,1)
@@ -252,19 +236,13 @@ public class View {
 
     jupiter.objectDrawable(gl,gla,modelview,proj,shaderLocations);
 
-    modelview.pop(); modelview.pop(); modelview.pop();
+    modelview.pop();
     /////////////////////////////////////////////////////
 
     ///////////////////Draw the pluto///////////////////
 
     plutoAngle =  (plutoAngle + 360f/SolarConstants.PLUTO_YEAR) % 360 ;
 
-    modelview.push(new Matrix4f());
-
-    modelview.push(new Matrix4f(modelview.peek()));
-    modelview.peek()
-            .lookAt(new Vector3f(lookAngle[0],lookAngle[1],lookAngle[2]),new Vector3f(0,
-            0,0),new Vector3f(0,1,0));
 
     modelview.push(new Matrix4f(modelview.peek()));
     modelview.peek()
@@ -273,8 +251,10 @@ public class View {
 
     pluto.objectDrawable(gl,gla,modelview,proj,shaderLocations);
 
-    modelview.pop(); modelview.pop(); modelview.pop();
+    modelview.pop();
     /////////////////////////////////////////////////////
+
+    modelview.pop(); modelview.pop(); modelview.pop();
 
     gl.glFlush();
     //disable the program
