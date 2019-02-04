@@ -27,10 +27,10 @@ public class SolarConstants {
 
 
     // Years on planets
-    public static final int MARS_YEAR = 500;
+    public static final int MARS_YEAR = 600;
     public static final int EARTH_YEAR = 365;
-    public static final int JUPITER_YEAR = 300;
-    public static final int PLUTO_YEAR = 600;
+    public static final int JUPITER_YEAR = 400;
+    public static final int PLUTO_YEAR = 200;
 
     // Years on satellites
     public static final int EARTH_SATELLITE_YEAR = 200;

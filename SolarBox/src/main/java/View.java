@@ -122,17 +122,18 @@ public class View {
 
     ////////////////////Set view angle/////////////////////
 
-    angleOfRotation = 0;//(angleOfRotation+0.5f)%360;
+    angleOfRotation = 0;//(angleOfRotation+0.2f)%360;
 
     modelview.push(new Matrix4f());
 
     modelview.push(new Matrix4f(modelview.peek()));
     modelview.peek()
-            .lookAt(new Vector3f(0,0,250),new Vector3f(0,
+            .lookAt(new Vector3f(0,0,300),new Vector3f(0,
                     0,0),new Vector3f(0,1,0));
 
     modelview.push(new Matrix4f(modelview.peek()));
     modelview.peek()
+            //.rotate((float)Math.toRadians(30),-1,0,0)
             .rotate((float)Math.toRadians(angleOfRotation),0,1,0);
 
     //////////////////////////////////////////////////////
@@ -210,15 +211,16 @@ public class View {
 
     modelview.push(new Matrix4f(modelview.peek()));
     modelview.peek()
-            .rotate((float)Math.toRadians(earthAngle),1,0,0)
+            .rotate((float)Math.toRadians(earthAngle),0,0,1)
             .translate(0,-80,0).scale(SolarConstants.EARTH_SIZE,SolarConstants.EARTH_SIZE,SolarConstants.EARTH_SIZE);
 
     earth.objectDrawable(gl,gla,modelview,proj,shaderLocations);
 
     modelview.push(new Matrix4f(modelview.peek()));
     modelview.peek()
-            .rotate(-(float)Math.toRadians(earthSatelliteAngle),0,1,0)
-            .translate(1,0,0).scale(SolarConstants.EARTH_SATELLITE_SIZE_RATIO,SolarConstants.EARTH_SATELLITE_SIZE_RATIO, SolarConstants.EARTH_SATELLITE_SIZE_RATIO);
+            .translate((float)Math.cos((float)Math.toRadians(earthSatelliteAngle)),((float)Math.sin((float)Math.toRadians(earthSatelliteAngle))*1.2f)-0.3f,0)
+            .scale(SolarConstants.EARTH_SATELLITE_SIZE_RATIO,SolarConstants.EARTH_SATELLITE_SIZE_RATIO, SolarConstants.EARTH_SATELLITE_SIZE_RATIO);
+
 
     earthSatellite.objectDrawable(gl,gla,modelview,proj,shaderLocations);
 
@@ -231,8 +233,9 @@ public class View {
 
     modelview.push(new Matrix4f(modelview.peek()));
     modelview.peek()
-            .rotate((float)Math.toRadians(jupiterAngle),0,0,1)
-            .translate(0,-100,0).scale(SolarConstants.JUPITER_SIZE,SolarConstants.JUPITER_SIZE,SolarConstants.JUPITER_SIZE);
+            .rotate((float)Math.toRadians(jupiterAngle),-1,0,0)
+            .translate(0,-120,0)
+            .scale(SolarConstants.JUPITER_SIZE,SolarConstants.JUPITER_SIZE,SolarConstants.JUPITER_SIZE);
 
     jupiter.objectDrawable(gl,gla,modelview,proj,shaderLocations);
 
@@ -244,10 +247,13 @@ public class View {
     plutoAngle =  (plutoAngle + 360f/SolarConstants.PLUTO_YEAR) % 360 ;
 
 
+
     modelview.push(new Matrix4f(modelview.peek()));
     modelview.peek()
-            .rotate((float)Math.toRadians(plutoAngle),0,-1,0)
-            .translate(-50,0,0).scale(SolarConstants.PLUTO_SIZE,SolarConstants.PLUTO_SIZE,SolarConstants.PLUTO_SIZE);
+            .rotate((float)Math.toRadians(45),0,-1,0)
+            .rotate((float)Math.toRadians(plutoAngle),0,0,1)
+            .translate(-50,0,0)
+            .scale(SolarConstants.PLUTO_SIZE,SolarConstants.PLUTO_SIZE,SolarConstants.PLUTO_SIZE);
 
     pluto.objectDrawable(gl,gla,modelview,proj,shaderLocations);
 
