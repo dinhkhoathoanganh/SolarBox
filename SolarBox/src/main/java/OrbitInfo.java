@@ -10,24 +10,17 @@ import util.PolygonMesh;
 import util.ShaderLocationsVault;
 
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class OrbitInfo {
 
     private PolygonMesh mesh = new PolygonMesh();
     private Map<String, String> shaderToVertexAttribute = new HashMap<String, String>();
 
-
-    private Matrix4f modelview = new Matrix4f();
     private FloatBuffer fb16 = Buffers.newDirectFloatBuffer(16);
-
-    //radius of the dot
-    private float radius = 250;
+    FloatBuffer fb4 = Buffers.newDirectFloatBuffer(4);
+    Vector4f colors = new Vector4f(1, 1, 1, 1); // white
     private int SLICES = 50;
-
 
     public PolygonMesh<IVertexData> getMesh() {
         return mesh;
@@ -37,13 +30,11 @@ public class OrbitInfo {
         return shaderToVertexAttribute;
     }
 
-    // drawing of the circle dot, called in method init()
+    // drawing of the circle, called in method init()
     public OrbitInfo() {
 
         List<Vector4f> positions = new ArrayList<Vector4f>();
 
-        //push the center of the circle as the first vertex
-        positions.add(new Vector4f(0,0,0,1));
         for (int i=0;i<SLICES;i++) {
             float theta = (float)(i*2*Math.PI/SLICES);
             positions.add(new Vector4f(
@@ -52,12 +43,7 @@ public class OrbitInfo {
                     0,
                     1));
         }
-
-        //we add the last vertex to make the circle watertight
         positions.add(new Vector4f(1,0,0,1));
-
-        Vector4f colors = new Vector4f(1, 0, 0, 1); // green
-
 
         //set up vertex attributes
         List<IVertexData> vertexData = new ArrayList<IVertexData>();
@@ -69,15 +55,14 @@ public class OrbitInfo {
                     positions.get(i).z,
                     positions.get(i).w});
             v.setData("color", new float[]{colors.x,colors.y,colors.z,colors.w});
+
             vertexData.add(v);
         }
 
 
+        //set up the indices
         List<Integer> indices = new ArrayList<Integer>();
-        /* we will use a GL_TRIANGLE_FAN, because this seems tailormade for
-    what we want to do here. This mode will use the indices in order
-    (0,1,2), (0,2,3), (0,3,4), ..., (0,n-1,n)
-     */
+
         for (int i=0;i<positions.size();i++) {
             indices.add(i);
         }
@@ -87,7 +72,8 @@ public class OrbitInfo {
         mesh.setVertexData(vertexData);
         mesh.setPrimitives(indices);
 
-        mesh.setPrimitiveType(GL.GL_TRIANGLE_FAN);
+        //circle outline
+        mesh.setPrimitiveType(GL.GL_TRIANGLE_STRIP);
         mesh.setPrimitiveSize(3);
 
         shaderToVertexAttribute.put("vPosition", "position");
@@ -95,24 +81,27 @@ public class OrbitInfo {
     }
 
 
+    public void OrbitDrawable(GL3 gl, GLAutoDrawable gla, ObjectInstance obj, Stack<Matrix4f> modelView, Matrix4f proj, ShaderLocationsVault shaderLocations){
 
-    // draw 7 polygons into a "8" formation, called in method draw()
-    public void DotDrawable(GL3 gl, GLAutoDrawable gla, ObjectInstance obj, Matrix4f proj, ShaderLocationsVault shaderLocations){
-
+        //pass the projection matrix to the shader
         gl.glUniformMatrix4fv(
                 shaderLocations.getLocation("projection"),
                 1, false, proj.get(fb16));
 
+        //pass the modelview matrix to the shader
+        gl.glUniformMatrix4fv(
+                shaderLocations.getLocation("modelview"),
+                1, false,  modelView.peek().get(fb16));
 
-            //scale then translate
-            modelview = new Matrix4f()
-                    .scale(radius,radius,1.0f);
+        //send the color of the triangle
+        gl.glUniform4fv(
+                shaderLocations.getLocation("vColor")
+                , 1, colors.get(fb4));
 
-            gl.glUniformMatrix4fv(
-                    shaderLocations.getLocation("modelview"),
-                    1, false, modelview.get(fb16));
+        gl.glPolygonMode(GL.GL_FRONT_AND_BACK,GL3.GL_LINE); //OUTLINES
+        gl.glPolygonMode(GL.GL_FRONT_AND_BACK,GL3.GL_LINE); //OUTLINES
 
-            obj.draw(gla);
+        obj.draw(gla);
 
     }
 }

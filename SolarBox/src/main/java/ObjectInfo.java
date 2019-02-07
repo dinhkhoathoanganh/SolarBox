@@ -7,6 +7,8 @@ import java.nio.FloatBuffer;
 import java.util.Map;
 import java.util.Stack;
 
+// Manage 3D object (planets and the box)
+
 public class ObjectInfo {
     public ObjectInstance meshObject;
     public Material objMaterial;
@@ -14,6 +16,7 @@ public class ObjectInfo {
     FloatBuffer fb16 = Buffers.newDirectFloatBuffer(16);
     FloatBuffer fb4 = Buffers.newDirectFloatBuffer(4);
 
+    // set the Mesh for object
     public void setMeshObject(GL3 gl, ShaderProgram program, ShaderLocationsVault shaderLocations, Map<String, String> shaderToVertexAttribute, PolygonMesh tmesh) {
         this.meshObject = new ObjectInstance(gl,
                 program,
@@ -23,6 +26,7 @@ public class ObjectInfo {
                 String(""));
     }
 
+    // set the color for object
     public void setObjMaterial(float[] ambient) {
         util.Material mat =  new util.Material();
 
@@ -31,6 +35,7 @@ public class ObjectInfo {
         this.objMaterial = mat;
     }
 
+    // call in view.draw() to draw object
     public void objectDrawable(GL3 gl, GLAutoDrawable gla, Stack<Matrix4f> modelView, Matrix4f proj, ShaderLocationsVault shaderLocations){
 
 
@@ -44,7 +49,7 @@ public class ObjectInfo {
                 shaderLocations.getLocation("modelview"),
                 1, false,  modelView.peek().get(fb16));
 
-        //send the color of the triangle
+        //send the color of the object
         gl.glUniform4fv(
                 shaderLocations.getLocation("vColor")
                 , 1, objMaterial.getAmbient().get(fb4));
